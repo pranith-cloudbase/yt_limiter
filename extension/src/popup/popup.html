@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyTube Focus</title>
+    <link rel="stylesheet" href="popup/popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <h1>StudyTube Focus</h1>
+      <p class="note">Keep data local by default. Backend is only used for syllabus parsing/scoring if enabled.</p>
+
+      <section class="section">
+        <label>Subject <input id="subject" type="text" placeholder="Physics" /></label>
+        <label>Subtopic <input id="subtopic" type="text" placeholder="Newton's Laws" /></label>
+        <label>Study goal <textarea id="goal" rows="2" placeholder="Only explanatory and problem-solving videos..."></textarea></label>
+      </section>
+
+      <section class="section">
+        <label>Strictness
+          <select id="strictness">
+            <option value="strict">Strict</option>
+            <option value="balanced">Balanced</option>
+            <option value="explore">Explore</option>
+          </select>
+        </label>
+        <label><input id="localOnlyMode" type="checkbox" /> Local-only mode (no backend calls)</label>
+        <label>Backend URL <input id="backendUrl" type="url" placeholder="http://127.0.0.1:8000" /></label>
+      </section>
+
+      <section class="section">
+        <label>Syllabus upload (optional)
+          <input id="syllabusFile" type="file" accept=".pdf,.docx,.txt" />
+        </label>
+        <button id="parseSyllabusBtn">Parse syllabus</button>
+        <div id="syllabusStatus" class="status"></div>
+      </section>
+
+      <section class="section row">
+        <button id="saveBtn">Save topic</button>
+        <button id="toggleBtn">Toggle filter</button>
+        <button id="pauseBtn">Pause mode</button>
+      </section>
+
+      <section class="section row">
+        <button id="revealBtn">Show hidden 60s</button>
+        <button id="openOptionsBtn">Open settings</button>
+      </section>
+
+      <section class="section">
+        <label>Pomodoro minutes <input id="pomodoroMinutes" type="number" min="5" max="90" /></label>
+        <label>Session goal <input id="sessionGoal" type="text" placeholder="Solve 20 force problems" /></label>
+        <button id="startPomodoroBtn">Start Pomodoro</button>
+        <div id="pomodoroStatus" class="status"></div>
+      </section>
+
+      <section class="section privacy">
+        <strong>Privacy notice:</strong>
+        <p>No account system, no analytics, local storage only unless you explicitly enable backend calls.</p>
+      </section>
+    </main>
+    <script type="module" src="popup/popup.js"></script>
+  </body>
+</html>

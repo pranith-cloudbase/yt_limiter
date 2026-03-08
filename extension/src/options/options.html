@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyTube Focus Settings</title>
+    <link rel="stylesheet" href="options/options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <h1>StudyTube Focus Settings</h1>
+
+      <section class="card">
+        <h2>Topic</h2>
+        <label>Subject <input id="subject" type="text" /></label>
+        <label>Subtopic <input id="subtopic" type="text" /></label>
+        <label>Study goal <textarea id="goal" rows="2"></textarea></label>
+        <label>Strictness
+          <select id="strictness">
+            <option value="strict">Strict</option>
+            <option value="balanced">Balanced</option>
+            <option value="explore">Explore</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Allowlist / Blocklist</h2>
+        <label>Allow channels (comma-separated)
+          <textarea id="allowChannels" rows="2" placeholder="Khan Academy, MIT OpenCourseWare"></textarea>
+        </label>
+        <label>Block channels (comma-separated)
+          <textarea id="blockChannels" rows="2" placeholder="Random Shorts Channel"></textarea>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Syllabus Summary</h2>
+        <pre id="syllabusSummary">No syllabus uploaded.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Backend + Privacy</h2>
+        <label><input id="localOnlyMode" type="checkbox" /> Local-only mode</label>
+        <label>Backend URL <input id="backendUrl" type="url" /></label>
+        <p class="small">Privacy notice: no analytics, no account system. Data stays in `chrome.storage.local` by default.</p>
+      </section>
+
+      <section class="card">
+        <h2>Session and Stats</h2>
+        <label>Session goal <input id="sessionGoal" type="text" /></label>
+        <label>Pomodoro minutes <input id="pomodoroMinutes" type="number" min="5" max="90" /></label>
+        <div id="stats"></div>
+      </section>
+
+      <section class="actions">
+        <button id="saveBtn">Save</button>
+        <button id="exportBtn">Export JSON</button>
+        <button id="importBtn">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" hidden />
+      </section>
+    </main>
+    <script type="module" src="options/options.js"></script>
+  </body>
+</html>

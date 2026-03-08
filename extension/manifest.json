@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "StudyTube Focus",
+  "version": "1.0.0",
+  "description": "Filter YouTube content so students stay focused on study topics.",
+  "permissions": ["storage", "tabs", "scripting"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_title": "StudyTube Focus",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background/background.js",
+    "type": "module"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content/loader.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "content/content.js", "shared/*.js"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
+}

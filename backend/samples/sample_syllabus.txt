@@ -1,0 +1,16 @@
+PHYS 101: Introductory Mechanics
+
+Unit 1: Kinematics and Graphical Analysis
+Unit 2: Newton's First, Second, and Third Laws
+Unit 3: Friction, Normal Force, and Inclined Planes
+Unit 4: Work, Energy, and Power
+Unit 5: Momentum and Collisions
+
+Learning outcomes:
+- Solve force-balance problems
+- Apply F=ma to multi-body systems
+- Explain inertia, action-reaction pairs, and free body diagrams
+
+Assessments:
+- Weekly problem sets
+- Midterm and final exams

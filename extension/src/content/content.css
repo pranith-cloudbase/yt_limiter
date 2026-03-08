@@ -1,0 +1,66 @@
+.studytube-floating-badge {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 999999;
+  background: #0f8f5f;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font: 600 12px/1 "Segoe UI", Tahoma, sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.studytube-relevant-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(15, 143, 95, 0.12);
+  color: #0f8f5f;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.studytube-reason {
+  margin-top: 4px;
+  color: #6e6e6e;
+  font-size: 11px;
+}
+
+.studytube-hidden {
+  display: none !important;
+}
+
+.studytube-blurred {
+  filter: blur(3px) saturate(0.6);
+  opacity: 0.45;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.studytube-collapsed {
+  max-height: 34px;
+  overflow: hidden;
+  opacity: 0.55;
+}
+
+.studytube-feedback {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.studytube-feedback-btn {
+  border: 1px solid #d5d5d5;
+  background: #ffffff;
+  color: #3a3a3a;
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.studytube-feedback-btn:hover {
+  border-color: #0f8f5f;
+  color: #0f8f5f;
+}

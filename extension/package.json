@@ -1,0 +1,14 @@
+{
+  "name": "studytube-focus-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StudyTube Focus Chrome extension",
+  "scripts": {
+    "build": "rm -rf dist && tsc && cp manifest.json dist/manifest.json && mkdir -p dist/popup dist/options dist/content dist/icons && cp src/popup/popup.html dist/popup.html && cp src/options/options.html dist/options.html && cp src/popup/popup.css dist/popup/popup.css && cp src/options/options.css dist/options/options.css && cp src/content/content.css dist/content/content.css && cp -R public/icons/. dist/icons/",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.325",
+    "typescript": "^5.8.2"
+  }
+}
