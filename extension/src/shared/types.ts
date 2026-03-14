@@ -22,7 +22,6 @@ export interface ExtensionSettings {
   syllabus: SyllabusSummary | null;
   allowChannels: string[];
   blockChannels: string[];
-  localOnlyMode: boolean;
   backendUrl: string;
   temporaryRevealUntil: number | null;
   sessionGoal: string;

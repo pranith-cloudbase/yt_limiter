@@ -17,7 +17,6 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   syllabus: null,
   allowChannels: [],
   blockChannels: [],
-  localOnlyMode: true,
   backendUrl: 'http://127.0.0.1:8000',
   temporaryRevealUntil: null,
   sessionGoal: '',

@@ -240,10 +240,6 @@ async function scoreCard(card: Element, settings: ExtensionSettings): Promise<Sc
 
   const localScore = localScoreVideo(metadata, settings.topic, settings.syllabus?.keywords || []);
 
-  if (settings.localOnlyMode) {
-    return localScore;
-  }
-
   try {
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.REQUEST_SCORE,

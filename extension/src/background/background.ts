@@ -73,11 +73,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === MESSAGE_TYPES.REQUEST_SCORE) {
     void (async () => {
       const settings = await getSettings();
-      if (settings.localOnlyMode) {
-        sendResponse({ ok: false, error: 'local_only_mode' });
-        return;
-      }
-
       try {
         const payload = message.payload as ScoreRequestPayload;
         const result = await scoreVideoWithBackend(settings.backendUrl, payload);

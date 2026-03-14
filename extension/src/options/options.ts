@@ -24,7 +24,6 @@ async function loadPage(): Promise<void> {
   el<HTMLSelectElement>('strictness').value = settings.strictness;
   el<HTMLTextAreaElement>('allowChannels').value = settings.allowChannels.join(', ');
   el<HTMLTextAreaElement>('blockChannels').value = settings.blockChannels.join(', ');
-  el<HTMLInputElement>('localOnlyMode').checked = settings.localOnlyMode;
   el<HTMLInputElement>('backendUrl').value = settings.backendUrl;
   el<HTMLInputElement>('sessionGoal').value = settings.sessionGoal;
   el<HTMLInputElement>('pomodoroMinutes').value = String(settings.pomodoroMinutes);
@@ -42,7 +41,6 @@ async function savePage(): Promise<void> {
   settings.strictness = el<HTMLSelectElement>('strictness').value as typeof settings.strictness;
   settings.allowChannels = parseCsv(el<HTMLTextAreaElement>('allowChannels').value);
   settings.blockChannels = parseCsv(el<HTMLTextAreaElement>('blockChannels').value);
-  settings.localOnlyMode = el<HTMLInputElement>('localOnlyMode').checked;
   settings.backendUrl = el<HTMLInputElement>('backendUrl').value.trim() || 'http://127.0.0.1:8000';
   settings.sessionGoal = el<HTMLInputElement>('sessionGoal').value.trim();
   settings.pomodoroMinutes = Number(el<HTMLInputElement>('pomodoroMinutes').value) || 25;
