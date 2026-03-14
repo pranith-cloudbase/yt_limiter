@@ -12,7 +12,7 @@ def test_relevant_video_scored_high() -> None:
         video_description="Learn F=ma with worked examples",
     )
     assert result["label"] in {"relevant", "borderline"}
-    assert result["score"] >= 0.35
+    assert result["score"] >= 0.4
 
 
 def test_irrelevant_video_scored_low() -> None:
@@ -27,22 +27,3 @@ def test_irrelevant_video_scored_low() -> None:
     )
     assert result["label"] == "irrelevant"
     assert result["score"] < 0.4
-
-
-def test_feedback_can_penalize_irrelevant_channel() -> None:
-    result = score_video(
-        topic="Math",
-        subtopic="Linear Algebra",
-        goal="matrix manipulation",
-        syllabus_keywords=["matrix", "vector", "determinant"],
-        video_title="Matrix Multiplication Tutorial",
-        video_channel="Spam Study Channel",
-        video_description="quick lecture",
-        feedback={
-            "likedChannels": [],
-            "dislikedChannels": ["spam study channel"],
-            "likedTerms": {},
-            "dislikedTerms": {},
-        },
-    )
-    assert result["score"] < 0.7

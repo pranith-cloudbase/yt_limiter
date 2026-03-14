@@ -1,8 +1,7 @@
 import { DEFAULT_SETTINGS, DEFAULT_STATS, MESSAGE_TYPES } from '../shared/constants.js';
 import { exportAllSettings, getSettings, importAllSettings, saveSettings, saveStats } from '../shared/storage.js';
 import { scoreVideoWithBackend } from '../shared/api.js';
-import { FeedbackVideoPayload, ScoreRequestPayload } from '../shared/types.js';
-import { normalizeText, tokenize } from '../shared/text.js';
+import { ScoreRequestPayload } from '../shared/types.js';
 
 async function safeNotifyTab(tabId: number, message: unknown): Promise<void> {
   try {
@@ -81,49 +80,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
       try {
         const payload = message.payload as ScoreRequestPayload;
-        payload.feedback = settings.feedback;
         const result = await scoreVideoWithBackend(settings.backendUrl, payload);
         sendResponse({ ok: true, result });
       } catch (error) {
         sendResponse({ ok: false, error: error instanceof Error ? error.message : 'backend_error' });
       }
-    })();
-    return true;
-  }
-
-  if (message?.type === MESSAGE_TYPES.RECORD_FEEDBACK) {
-    void (async () => {
-      const payload = message.payload as FeedbackVideoPayload;
-      const settings = await getSettings();
-      const channel = normalizeText(payload.video_channel);
-      const tokens = tokenize(`${payload.video_title} ${payload.video_description}`).slice(0, 24);
-
-      if (payload.feedback_type === 'relevant') {
-        if (channel) {
-          settings.feedback.likedChannels = [...new Set([...settings.feedback.likedChannels, channel])];
-          settings.feedback.dislikedChannels = settings.feedback.dislikedChannels.filter((item) => item !== channel);
-        }
-        for (const token of tokens) {
-          settings.feedback.likedTerms[token] = (settings.feedback.likedTerms[token] || 0) + 1;
-          if (settings.feedback.dislikedTerms[token]) {
-            settings.feedback.dislikedTerms[token] = Math.max(0, settings.feedback.dislikedTerms[token] - 1);
-          }
-        }
-      } else {
-        if (channel) {
-          settings.feedback.dislikedChannels = [...new Set([...settings.feedback.dislikedChannels, channel])];
-          settings.feedback.likedChannels = settings.feedback.likedChannels.filter((item) => item !== channel);
-        }
-        for (const token of tokens) {
-          settings.feedback.dislikedTerms[token] = (settings.feedback.dislikedTerms[token] || 0) + 1;
-          if (settings.feedback.likedTerms[token]) {
-            settings.feedback.likedTerms[token] = Math.max(0, settings.feedback.likedTerms[token] - 1);
-          }
-        }
-      }
-
-      await saveSettings(settings);
-      sendResponse({ ok: true });
     })();
     return true;
   }

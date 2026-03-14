@@ -21,13 +21,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   backendUrl: 'http://127.0.0.1:8000',
   temporaryRevealUntil: null,
   sessionGoal: '',
-  pomodoroMinutes: 25,
-  feedback: {
-    likedChannels: [],
-    dislikedChannels: [],
-    likedTerms: {},
-    dislikedTerms: {}
-  }
+  pomodoroMinutes: 25
 };
 
 export const DEFAULT_STATS: SessionStats = {
@@ -43,6 +37,5 @@ export const MESSAGE_TYPES = {
   SHOW_TEMPORARILY: 'SHOW_TEMPORARILY',
   EXPORT_SETTINGS: 'EXPORT_SETTINGS',
   IMPORT_SETTINGS: 'IMPORT_SETTINGS',
-  REQUEST_SCORE: 'REQUEST_SCORE',
-  RECORD_FEEDBACK: 'RECORD_FEEDBACK'
+  REQUEST_SCORE: 'REQUEST_SCORE'
 } as const;

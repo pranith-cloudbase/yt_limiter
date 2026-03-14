@@ -43,24 +43,3 @@
   overflow: hidden;
   opacity: 0.55;
 }
-
-.studytube-feedback {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.studytube-feedback-btn {
-  border: 1px solid #d5d5d5;
-  background: #ffffff;
-  color: #3a3a3a;
-  border-radius: 999px;
-  font-size: 11px;
-  padding: 2px 8px;
-  cursor: pointer;
-}
-
-.studytube-feedback-btn:hover {
-  border-color: #0f8f5f;
-  color: #0f8f5f;
-}

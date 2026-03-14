@@ -8,10 +8,14 @@ const CARD_SELECTOR = [
   'ytd-rich-item-renderer',
   'ytd-video-renderer',
   'ytd-compact-video-renderer',
-  'ytd-grid-video-renderer'
+  'ytd-grid-video-renderer',
+  'ytd-compact-playlist-renderer',
+  'ytd-compact-radio-renderer',
+  'yt-lockup-view-model'
 ].join(',');
 
 const WATCH_PAGE_PATH = '/watch';
+const SEARCH_PAGE_PATH = '/results';
 let observer: MutationObserver | null = null;
 let debounceTimer: number | null = null;
 
@@ -48,6 +52,10 @@ function isWatchPage(): boolean {
   return window.location.pathname.startsWith(WATCH_PAGE_PATH);
 }
 
+function isSearchPage(): boolean {
+  return window.location.pathname.startsWith(SEARCH_PAGE_PATH);
+}
+
 function ensureFloatingBadge(settings: ExtensionSettings): void {
   let badge = document.getElementById(BADGE_ID);
   if (!settings.enabled || settings.paused) {
@@ -72,13 +80,67 @@ function textContentFrom(el: Element | null): string {
   return (el?.textContent || '').trim();
 }
 
+function getCardLink(card: Element): string {
+  const href = (card.querySelector('a#thumbnail, a#video-title, a#video-title-link') as HTMLAnchorElement | null)?.href || '';
+  return href;
+}
+
+function isSidebarCard(card: Element): boolean {
+  return Boolean(card.closest('#secondary, #secondary-inner, #related, ytd-watch-next-secondary-results-renderer'));
+}
+
+function getCandidateCards(): Element[] {
+  const selectors = CARD_SELECTOR;
+
+  if (isWatchPage()) {
+    return Array.from(
+      new Set(
+        Array.from(
+          document.querySelectorAll(
+            [
+              `#secondary ${selectors}`,
+              `#secondary-inner ${selectors}`,
+              `#related ${selectors}`,
+              `ytd-watch-next-secondary-results-renderer ${selectors}`,
+              `ytd-watch-flexy ${selectors}`
+            ].join(', ')
+          )
+        ).filter((card) => isSidebarCard(card))
+      )
+    );
+  }
+
+  if (isSearchPage()) {
+    return Array.from(document.querySelectorAll(`ytd-search ${selectors}, ytd-two-column-search-results-renderer ${selectors}`));
+  }
+
+  return Array.from(
+    document.querySelectorAll(
+      `ytd-browse ${selectors}, ytd-rich-grid-renderer ${selectors}, ytd-two-column-browse-results-renderer ${selectors}`
+    )
+  );
+}
+
 function extractVideoMetadata(card: Element): VideoMetadata {
-  const titleEl = card.querySelector('#video-title, a#video-title, h3 a, #video-title-link');
-  const channelEl = card.querySelector('ytd-channel-name #text, #channel-name a, #byline a, #text.ytd-channel-name');
-  const descriptionEl = card.querySelector('#description-text, #metadata-line, yt-formatted-string#description-text');
+  const titleEl = card.querySelector(
+    '#video-title, a#video-title, h3 a, #video-title-link, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__title span'
+  );
+  const channelEl = card.querySelector(
+    'ytd-channel-name #text, #channel-name a, #byline a, #text.ytd-channel-name, .yt-content-metadata-view-model__metadata-row:first-child span.yt-content-metadata-view-model__metadata-text'
+  );
+  const descriptionEl = card.querySelector(
+    '#description-text, #metadata-line, yt-formatted-string#description-text, .yt-content-metadata-view-model__metadata-row:nth-child(2)'
+  );
+  const titleFallback =
+    (titleEl as HTMLElement | null)?.getAttribute('title') ||
+    (card as HTMLElement).getAttribute('title') ||
+    (card.querySelector('a#thumbnail, a#video-title, a#video-title-link') as HTMLElement | null)?.getAttribute('aria-label') ||
+    (card.querySelector('.yt-lockup-metadata-view-model__title') as HTMLElement | null)?.getAttribute('aria-label') ||
+    (card.querySelector('#dismissible') as HTMLElement | null)?.getAttribute('aria-label') ||
+    '';
 
   return {
-    title: textContentFrom(titleEl),
+    title: textContentFrom(titleEl) || titleFallback,
     channel: textContentFrom(channelEl),
     description: textContentFrom(descriptionEl)
   };
@@ -87,6 +149,17 @@ function extractVideoMetadata(card: Element): VideoMetadata {
 function shouldSkipCard(card: Element): boolean {
   if (card.closest('ytd-watch-metadata')) {
     return true;
+  }
+  if (card.closest('ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, feed-ad-metadata-view-model')) {
+    return true;
+  }
+  if (isWatchPage()) {
+    const currentUrl = new URL(window.location.href);
+    const currentVideoId = currentUrl.searchParams.get('v');
+    const cardHref = getCardLink(card);
+    if (currentVideoId && cardHref.includes(`v=${currentVideoId}`)) {
+      return true;
+    }
   }
   return false;
 }
@@ -101,10 +174,6 @@ function applyCardState(card: Element, score: ScoreResult, settings: ExtensionSe
   const existingReason = card.querySelector('.studytube-reason');
   if (existingReason) {
     existingReason.remove();
-  }
-  const existingFeedback = card.querySelector('.studytube-feedback');
-  if (existingFeedback) {
-    existingFeedback.remove();
   }
 
   const channel = (card.querySelector('#channel-name a, #byline a')?.textContent || '').trim().toLowerCase();
@@ -151,49 +220,10 @@ function applyCardState(card: Element, score: ScoreResult, settings: ExtensionSe
     card.appendChild(reason);
   }
 
-  const feedback = document.createElement('div');
-  feedback.className = 'studytube-feedback';
-
-  const relevantBtn = document.createElement('button');
-  relevantBtn.className = 'studytube-feedback-btn';
-  relevantBtn.type = 'button';
-  relevantBtn.textContent = 'Relevant';
-  relevantBtn.addEventListener('click', async (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-    const meta = extractVideoMetadata(card);
-    await chrome.runtime.sendMessage({
-      type: MESSAGE_TYPES.RECORD_FEEDBACK,
-      payload: {
-        video_title: meta.title,
-        video_channel: meta.channel,
-        video_description: meta.description,
-        feedback_type: 'relevant'
-      }
-    });
-  });
-
-  const irrelevantBtn = document.createElement('button');
-  irrelevantBtn.className = 'studytube-feedback-btn';
-  irrelevantBtn.type = 'button';
-  irrelevantBtn.textContent = 'Not relevant';
-  irrelevantBtn.addEventListener('click', async (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-    const meta = extractVideoMetadata(card);
-    await chrome.runtime.sendMessage({
-      type: MESSAGE_TYPES.RECORD_FEEDBACK,
-      payload: {
-        video_title: meta.title,
-        video_channel: meta.channel,
-        video_description: meta.description,
-        feedback_type: 'irrelevant'
-      }
-    });
-  });
-
-  feedback.append(relevantBtn, irrelevantBtn);
-  card.appendChild(feedback);
+  // Sidebar cards are compact; collapsing them too hard makes the column jump.
+  if (isSidebarCard(card) && card.classList.contains('studytube-collapsed') && !card.classList.contains('studytube-hidden')) {
+    card.classList.remove('studytube-collapsed');
+  }
 }
 
 async function scoreCard(card: Element, settings: ExtensionSettings): Promise<ScoreResult> {
@@ -208,7 +238,7 @@ async function scoreCard(card: Element, settings: ExtensionSettings): Promise<Sc
     };
   }
 
-  const localScore = localScoreVideo(metadata, settings.topic, settings.syllabus?.keywords || [], settings.feedback);
+  const localScore = localScoreVideo(metadata, settings.topic, settings.syllabus?.keywords || []);
 
   if (settings.localOnlyMode) {
     return localScore;
@@ -224,8 +254,7 @@ async function scoreCard(card: Element, settings: ExtensionSettings): Promise<Sc
         syllabus_keywords: settings.syllabus?.keywords || [],
         video_title: metadata.title,
         video_channel: metadata.channel,
-        video_description: metadata.description,
-        feedback: settings.feedback
+        video_description: metadata.description
       }
     });
 
@@ -249,14 +278,14 @@ async function scoreAndRender(): Promise<void> {
   ensureFloatingBadge(settings);
 
   if ((!settings.topic.subject && !settings.topic.subtopic) || !settings.enabled || settings.paused) {
-    const cards = document.querySelectorAll(CARD_SELECTOR);
+    const cards = getCandidateCards();
     cards.forEach((card) => {
       card.classList.remove('studytube-hidden', 'studytube-blurred', 'studytube-collapsed');
     });
     return;
   }
 
-  const cards = Array.from(document.querySelectorAll(CARD_SELECTOR)).filter((card) => !shouldSkipCard(card));
+  const cards = getCandidateCards().filter((card) => !shouldSkipCard(card));
 
   const decorated: DecoratedCard[] = [];
   for (const card of cards) {

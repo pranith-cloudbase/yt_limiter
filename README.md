@@ -9,7 +9,6 @@ StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional 
 ├── backend
 │   ├── .env.example
 │   ├── requirements-dev.txt
-│   ├── requirements-ml.txt
 │   ├── requirements.txt
 │   ├── app
 │   │   ├── __init__.py
@@ -33,10 +32,9 @@ StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional 
     ├── src
     │   ├── background
     │   │   └── background.ts
-│   ├── content
-│   │   ├── content.css
-│   │   ├── loader.ts
-│   │   └── content.ts
+    │   ├── content
+    │   │   ├── content.css
+    │   │   └── content.ts
     │   ├── options
     │   │   ├── options.css
     │   │   ├── options.html
@@ -66,10 +64,7 @@ StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional 
 - Hybrid relevance scoring:
   - keyword matching
   - phrase similarity
-  - semantic token similarity
   - weighted score
-- Optional backend semantic model (`sentence-transformers`) with TF-IDF fallback
-- On-card feedback buttons (`Relevant` / `Not relevant`) that personalize future scores
 - Strictness modes:
   - `strict`: hides unrelated cards
   - `balanced`: blurs/collapses unrelated cards
@@ -117,10 +112,6 @@ StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional 
    ```bash
    pip install -r requirements.txt
    ```
-   Optional semantic model:
-   ```bash
-   pip install -r requirements-ml.txt
-   ```
 4. Run the API:
    ```bash
    uvicorn app.main:app --reload --port 8000
@@ -162,13 +153,7 @@ Input:
   "syllabus_keywords": ["force", "inertia"],
   "video_title": "...",
   "video_channel": "...",
-  "video_description": "...",
-  "feedback": {
-    "likedChannels": ["example channel"],
-    "dislikedChannels": [],
-    "likedTerms": {"matrix": 2},
-    "dislikedTerms": {"meme": 1}
-  }
+  "video_description": "..."
 }
 ```
 
@@ -177,8 +162,7 @@ Output:
 {
   "score": 0.78,
   "label": "relevant",
-  "reasons": ["matched keyword: force"],
-  "model_used": "sentence-transformers"
+  "reasons": ["matched keyword: force"]
 }
 ```
 
@@ -213,3 +197,4 @@ pytest -q
 - Extension only filters client-side visibility of cards the user sees.
 - No ad bypassing, no playback interception, no YouTube restrictions bypass.
 - No aggressive scraping; metadata extraction is limited to visible card fields.
+

@@ -6,13 +6,6 @@ export interface TopicConfig {
   goal?: string;
 }
 
-export interface FeedbackProfile {
-  likedChannels: string[];
-  dislikedChannels: string[];
-  likedTerms: Record<string, number>;
-  dislikedTerms: Record<string, number>;
-}
-
 export interface SyllabusSummary {
   course_title: string;
   units: string[];
@@ -34,7 +27,6 @@ export interface ExtensionSettings {
   temporaryRevealUntil: number | null;
   sessionGoal: string;
   pomodoroMinutes: number;
-  feedback: FeedbackProfile;
 }
 
 export interface VideoMetadata {
@@ -64,21 +56,12 @@ export interface ScoreRequestPayload {
   video_title: string;
   video_channel: string;
   video_description: string;
-  feedback?: FeedbackProfile;
 }
 
 export interface ScoreResponsePayload {
   score: number;
   label: 'relevant' | 'borderline' | 'irrelevant';
   reasons: string[];
-  model_used?: string;
-}
-
-export interface FeedbackVideoPayload {
-  video_title: string;
-  video_channel: string;
-  video_description: string;
-  feedback_type: 'relevant' | 'irrelevant';
 }
 
 export interface StorageShape {

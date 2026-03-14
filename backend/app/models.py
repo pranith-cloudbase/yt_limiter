@@ -17,11 +17,9 @@ class ScoreVideoRequest(BaseModel):
     video_title: str = Field(default="")
     video_channel: str = Field(default="")
     video_description: str = Field(default="")
-    feedback: dict = Field(default_factory=dict)
 
 
 class ScoreVideoResponse(BaseModel):
     score: float
     label: str
     reasons: list[str]
-    model_used: str = "tfidf"

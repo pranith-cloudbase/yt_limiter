@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import re
 from collections import Counter
-from functools import lru_cache
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -60,6 +59,7 @@ def split_units(text: str) -> list[str]:
             units.append(line)
 
     if not units:
+        # Fallback to top non-trivial lines.
         units = [ln for ln in lines if len(ln.split()) >= 3][:8]
 
     return units[:12]
@@ -88,56 +88,6 @@ def summarize_syllabus(text: str) -> dict:
     }
 
 
-def _tfidf_similarity(topic_text: str, video_text: str) -> float:
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
-    matrix = vectorizer.fit_transform([topic_text, video_text])
-    return float(cosine_similarity(matrix[0:1], matrix[1:2])[0][0])
-
-
-@lru_cache(maxsize=1)
-def _load_embedding_model():
-    try:
-        from sentence_transformers import SentenceTransformer  # type: ignore
-
-        return SentenceTransformer("all-MiniLM-L6-v2")
-    except Exception:
-        return None
-
-
-def _embedding_similarity(topic_text: str, video_text: str) -> tuple[float, str]:
-    model = _load_embedding_model()
-    if model is None:
-        return _tfidf_similarity(topic_text, video_text), "tfidf"
-
-    embeddings = model.encode([topic_text, video_text], normalize_embeddings=True)
-    similarity = float(embeddings[0] @ embeddings[1])
-    return similarity, "sentence-transformers"
-
-
-def _feedback_adjustment(feedback: dict, channel: str, matched_keywords: list[str]) -> tuple[float, list[str]]:
-    reasons: list[str] = []
-    score_delta = 0.0
-
-    liked_channels = {normalize(item) for item in feedback.get("likedChannels", [])}
-    disliked_channels = {normalize(item) for item in feedback.get("dislikedChannels", [])}
-    liked_terms: dict = feedback.get("likedTerms", {})
-    disliked_terms: dict = feedback.get("dislikedTerms", {})
-
-    channel_norm = normalize(channel)
-    if channel_norm and channel_norm in liked_channels:
-        score_delta += 0.12
-        reasons.append("boosted by your relevant-channel feedback")
-    if channel_norm and channel_norm in disliked_channels:
-        score_delta -= 0.18
-        reasons.append("penalized by your irrelevant-channel feedback")
-
-    for kw in matched_keywords[:12]:
-        score_delta += float(liked_terms.get(kw, 0)) * 0.012
-        score_delta -= float(disliked_terms.get(kw, 0)) * 0.018
-
-    return score_delta, reasons
-
-
 def score_video(
     *,
     topic: str,
@@ -147,7 +97,6 @@ def score_video(
     video_title: str,
     video_channel: str,
     video_description: str,
-    feedback: dict | None = None,
 ) -> dict:
     topic_text = " ".join([topic, subtopic, goal, *syllabus_keywords]).strip()
     video_text = " ".join([video_title, video_channel, video_description]).strip()
@@ -157,7 +106,6 @@ def score_video(
             "score": 0.0,
             "label": "irrelevant",
             "reasons": ["insufficient topic/video context"],
-            "model_used": "tfidf",
         }
 
     t_norm = normalize(topic_text)
@@ -167,22 +115,19 @@ def score_video(
     keyword_matches = [kw for kw in topic_keywords if kw in v_norm]
     keyword_score = min(len(keyword_matches) / 10.0, 1.0)
 
-    similarity, model_used = _embedding_similarity(t_norm, v_norm)
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1)
+    matrix = vectorizer.fit_transform([t_norm, v_norm])
+    similarity = float(cosine_similarity(matrix[0:1], matrix[1:2])[0][0])
 
     title_boost = 0.15 if any(kw in normalize(video_title) for kw in keyword_matches[:5]) else 0.0
     noise_penalty = 0.08 if re.search(r"\b(prank|meme|compilation|gaming)\b", normalize(video_channel)) else 0.0
 
-    feedback_delta, feedback_reasons = _feedback_adjustment(feedback or {}, video_channel, keyword_matches)
-
-    score = max(
-        0.0,
-        min(1.0, 0.40 * keyword_score + 0.43 * similarity + title_boost + feedback_delta - noise_penalty),
-    )
+    score = max(0.0, min(1.0, 0.55 * keyword_score + 0.35 * similarity + title_boost - noise_penalty))
     score = math.floor(score * 1000) / 1000
 
-    if score >= 0.56:
+    if score >= 0.62:
         label = "relevant"
-    elif score >= 0.33:
+    elif score >= 0.40:
         label = "borderline"
     else:
         label = "irrelevant"
@@ -192,9 +137,6 @@ def score_video(
         reasons.append(f"matched keyword: {keyword_matches[0]}")
     if subtopic and normalize(subtopic) in normalize(video_title):
         reasons.append(f"matched topic phrase: {subtopic}")
-    if similarity >= 0.33:
-        reasons.append("semantic similarity with study focus")
-    reasons.extend(feedback_reasons)
     if not reasons:
         reasons.append("low overlap with current study intent")
 
@@ -202,5 +144,4 @@ def score_video(
         "score": score,
         "label": label,
         "reasons": reasons,
-        "model_used": model_used,
     }

@@ -27,4 +27,3 @@ def test_score_video_endpoint() -> None:
     data = response.json()
     assert 'score' in data
     assert data['label'] in {'relevant', 'borderline', 'irrelevant'}
-    assert data['model_used'] in {'tfidf', 'sentence-transformers'}

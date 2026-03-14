@@ -55,6 +55,5 @@ def score_video_endpoint(payload: ScoreVideoRequest) -> ScoreVideoResponse:
         video_title=payload.video_title,
         video_channel=payload.video_channel,
         video_description=payload.video_description,
-        feedback=payload.feedback,
     )
     return ScoreVideoResponse(**result)

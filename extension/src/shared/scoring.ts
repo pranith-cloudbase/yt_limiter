@@ -1,4 +1,4 @@
-import { FeedbackProfile, ScoreResult, TopicConfig, VideoMetadata } from './types.js';
+import { ScoreResult, TopicConfig, VideoMetadata } from './types.js';
 import { diceCoefficient, normalizeText, tokenize, unique } from './text.js';
 
 const STOPWORDS = new Set([
@@ -101,8 +101,7 @@ function cosineSimilarity(aTokens: string[], bTokens: string[]): number {
 export function localScoreVideo(
   video: VideoMetadata,
   topic: TopicConfig,
-  syllabusKeywords: string[],
-  feedback?: FeedbackProfile
+  syllabusKeywords: string[]
 ): ScoreResult {
   const title = normalizeText(video.title);
   const channel = normalizeText(video.channel);
@@ -124,21 +123,8 @@ export function localScoreVideo(
 
   const titleBoost = matchedKeywords.some((kw) => title.includes(stemToken(kw))) ? 0.14 : 0;
   const channelPenalty = /music|gaming|shorts|meme/.test(channel) ? 0.1 : 0;
-  const channelBoost = feedback?.likedChannels.some((item) => channel.includes(normalizeText(item))) ? 0.12 : 0;
-  const dislikedChannelPenalty = feedback?.dislikedChannels.some((item) => channel.includes(normalizeText(item))) ? 0.18 : 0;
-  const likedTermBoost = matchedKeywords.reduce((sum, kw) => sum + (feedback?.likedTerms[kw] || 0) * 0.015, 0);
-  const dislikedTermPenalty = matchedKeywords.reduce((sum, kw) => sum + (feedback?.dislikedTerms[kw] || 0) * 0.02, 0);
 
-  let score =
-    0.34 * keywordScore +
-    0.41 * semanticScore +
-    0.22 * phraseSimilarity +
-    titleBoost +
-    channelBoost +
-    likedTermBoost -
-    channelPenalty -
-    dislikedChannelPenalty -
-    dislikedTermPenalty;
+  let score = 0.34 * keywordScore + 0.41 * semanticScore + 0.22 * phraseSimilarity + titleBoost - channelPenalty;
   score = Math.max(0, Math.min(score, 1));
 
   let label: ScoreResult['label'];
@@ -159,12 +145,6 @@ export function localScoreVideo(
   }
   if (semanticScore > 0.36) {
     reasons.push('semantic similarity with study focus');
-  }
-  if (channelBoost > 0) {
-    reasons.push('boosted by your relevant-channel feedback');
-  }
-  if (dislikedChannelPenalty > 0) {
-    reasons.push('penalized by your irrelevant-channel feedback');
   }
   if (!reasons.length) {
     reasons.push('low topical overlap with active study focus');
