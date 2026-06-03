@@ -11,7 +11,7 @@ async function safeNotifyTab(tabId: number, message: unknown): Promise<void> {
     if (messageText.includes('Receiving end does not exist')) {
       return;
     }
-    console.warn('StudyTube Focus: tab message failed', messageText);
+    console.warn('FocusTube: tab message failed', messageText);
   }
 }
 

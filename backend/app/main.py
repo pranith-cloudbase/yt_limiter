@@ -9,9 +9,9 @@ from .models import ParseSyllabusResponse, ScoreVideoRequest, ScoreVideoResponse
 from .nlp import score_video, summarize_syllabus
 from .parsers import UnsupportedFileTypeError, parse_file_to_text
 
-app = FastAPI(title="StudyTube Focus Backend", version="1.0.0")
+app = FastAPI(title="FocusTube Backend", version="1.0.0")
 
-origins_env = os.getenv("STUDYTUBE_CORS_ORIGINS", "http://localhost,http://127.0.0.1")
+origins_env = os.getenv("FOCUSTUBE_CORS_ORIGINS", "http://localhost,http://127.0.0.1")
 origins = [item.strip() for item in origins_env.split(",") if item.strip()]
 
 app.add_middleware(

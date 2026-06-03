@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   syllabus: null,
   allowChannels: [],
   blockChannels: [],
-  backendUrl: 'http://127.0.0.1:8000',
+  backendUrl: 'http://ytlimiter-production.up.railway.app/',
   temporaryRevealUntil: null,
   sessionGoal: '',
   pomodoroMinutes: 25

@@ -1,16 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "StudyTube Focus",
+  "name": "FocusTube",
   "version": "1.0.0",
   "description": "Filter YouTube content so students stay focused on study topics.",
   "permissions": ["storage", "tabs", "scripting"],
   "host_permissions": [
     "https://www.youtube.com/*",
     "http://127.0.0.1:8000/*",
-    "http://localhost:8000/*"
+    "http://localhost:8000/*",
+    "http://ytlimiter-production.up.railway.app/*",
+    "https://ytlimiter-production.up.railway.app/*"
   ],
   "action": {
-    "default_title": "StudyTube Focus",
+    "default_title": "FocusTube",
     "default_popup": "popup.html"
   },
   "background": {

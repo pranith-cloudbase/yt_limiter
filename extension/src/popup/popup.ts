@@ -17,7 +17,6 @@ async function initialize(): Promise<void> {
   const subtopic = getElement<HTMLInputElement>('subtopic');
   const goal = getElement<HTMLTextAreaElement>('goal');
   const strictness = getElement<HTMLSelectElement>('strictness');
-  const backendUrl = getElement<HTMLInputElement>('backendUrl');
   const pomodoroMinutes = getElement<HTMLInputElement>('pomodoroMinutes');
   const sessionGoal = getElement<HTMLInputElement>('sessionGoal');
 
@@ -25,7 +24,6 @@ async function initialize(): Promise<void> {
   subtopic.value = settings.topic.subtopic;
   goal.value = settings.topic.goal || '';
   strictness.value = settings.strictness;
-  backendUrl.value = settings.backendUrl;
   pomodoroMinutes.value = String(settings.pomodoroMinutes || 25);
   sessionGoal.value = settings.sessionGoal || '';
 }
@@ -36,7 +34,6 @@ async function saveTopicAndSettings(): Promise<void> {
   settings.topic.subtopic = getElement<HTMLInputElement>('subtopic').value.trim();
   settings.topic.goal = getElement<HTMLTextAreaElement>('goal').value.trim();
   settings.strictness = getElement<HTMLSelectElement>('strictness').value as typeof settings.strictness;
-  settings.backendUrl = getElement<HTMLInputElement>('backendUrl').value.trim() || 'http://127.0.0.1:8000';
   settings.sessionGoal = getElement<HTMLInputElement>('sessionGoal').value.trim();
   settings.pomodoroMinutes = Number(getElement<HTMLInputElement>('pomodoroMinutes').value) || 25;
   await saveSettings(settings);

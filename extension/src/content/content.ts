@@ -3,7 +3,7 @@ import { getSettings, getStats, saveStats } from '../shared/storage.js';
 import { localScoreVideo } from '../shared/scoring.js';
 import { ExtensionSettings, ScoreResult, VideoMetadata } from '../shared/types.js';
 
-const BADGE_ID = 'studytube-floating-badge';
+const BADGE_ID = 'focustube-floating-badge';
 const CARD_SELECTOR = [
   'ytd-rich-item-renderer',
   'ytd-video-renderer',
@@ -37,7 +37,7 @@ function runSafely(task: () => Promise<void>): void {
       }
       return;
     }
-    console.error('StudyTube Focus content error', error);
+    console.error('FocusTube content error', error);
   });
 }
 
@@ -68,12 +68,12 @@ function ensureFloatingBadge(settings: ExtensionSettings): void {
   if (!badge) {
     badge = document.createElement('div');
     badge.id = BADGE_ID;
-    badge.className = 'studytube-floating-badge';
+    badge.className = 'focustube-floating-badge';
     document.body.appendChild(badge);
   }
 
   const topic = `${settings.topic.subject} ${settings.topic.subtopic}`.trim();
-  badge.textContent = topic ? `Study Mode ON: ${topic}` : 'Study Mode ON';
+  badge.textContent = topic ? `FocusTube ON: ${topic}` : 'FocusTube ON';
 }
 
 function textContentFrom(el: Element | null): string {
@@ -165,13 +165,13 @@ function shouldSkipCard(card: Element): boolean {
 }
 
 function applyCardState(card: Element, score: ScoreResult, settings: ExtensionSettings): void {
-  card.classList.remove('studytube-hidden', 'studytube-blurred', 'studytube-collapsed');
+  card.classList.remove('focustube-hidden', 'focustube-blurred', 'focustube-collapsed');
 
-  const existingBadge = card.querySelector('.studytube-relevant-badge');
+  const existingBadge = card.querySelector('.focustube-relevant-badge');
   if (existingBadge) {
     existingBadge.remove();
   }
-  const existingReason = card.querySelector('.studytube-reason');
+  const existingReason = card.querySelector('.focustube-reason');
   if (existingReason) {
     existingReason.remove();
   }
@@ -184,7 +184,7 @@ function applyCardState(card: Element, score: ScoreResult, settings: ExtensionSe
   const irrelevant = score.label === 'irrelevant' && !isAllow;
 
   if (isBlocked) {
-    card.classList.add('studytube-hidden');
+    card.classList.add('focustube-hidden');
     return;
   }
 
@@ -193,36 +193,36 @@ function applyCardState(card: Element, score: ScoreResult, settings: ExtensionSe
   }
 
   if (settings.strictness === 'strict' && irrelevant) {
-    card.classList.add('studytube-hidden');
+    card.classList.add('focustube-hidden');
   }
 
   if (settings.strictness === 'balanced' && irrelevant) {
-    card.classList.add('studytube-blurred', 'studytube-collapsed');
+    card.classList.add('focustube-blurred', 'focustube-collapsed');
   }
 
   if (settings.strictness === 'explore' && irrelevant) {
-    card.classList.add('studytube-collapsed');
+    card.classList.add('focustube-collapsed');
     const warning = document.createElement('div');
-    warning.className = 'studytube-reason';
+    warning.className = 'focustube-reason';
     warning.textContent = 'Lower priority: outside current focus topic';
     card.appendChild(warning);
   }
 
   if (score.label !== 'irrelevant') {
     const badge = document.createElement('div');
-    badge.className = 'studytube-relevant-badge';
+    badge.className = 'focustube-relevant-badge';
     badge.textContent = `Relevant to ${settings.topic.subtopic || settings.topic.subject || 'study topic'}`;
     card.appendChild(badge);
 
     const reason = document.createElement('div');
-    reason.className = 'studytube-reason';
+    reason.className = 'focustube-reason';
     reason.textContent = score.reasons[0] || 'Topical overlap detected';
     card.appendChild(reason);
   }
 
   // Sidebar cards are compact; collapsing them too hard makes the column jump.
-  if (isSidebarCard(card) && card.classList.contains('studytube-collapsed') && !card.classList.contains('studytube-hidden')) {
-    card.classList.remove('studytube-collapsed');
+  if (isSidebarCard(card) && card.classList.contains('focustube-collapsed') && !card.classList.contains('focustube-hidden')) {
+    card.classList.remove('focustube-collapsed');
   }
 }
 
@@ -276,7 +276,7 @@ async function scoreAndRender(): Promise<void> {
   if ((!settings.topic.subject && !settings.topic.subtopic) || !settings.enabled || settings.paused) {
     const cards = getCandidateCards();
     cards.forEach((card) => {
-      card.classList.remove('studytube-hidden', 'studytube-blurred', 'studytube-collapsed');
+      card.classList.remove('focustube-hidden', 'focustube-blurred', 'focustube-collapsed');
     });
     return;
   }
@@ -296,7 +296,7 @@ async function scoreAndRender(): Promise<void> {
 
   for (const { card, score } of decorated) {
     applyCardState(card, score, settings);
-    if (card.classList.contains('studytube-hidden')) {
+    if (card.classList.contains('focustube-hidden')) {
       hiddenCount += 1;
     }
     if (score.label !== 'irrelevant') {

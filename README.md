@@ -1,6 +1,6 @@
-# StudyTube Focus
+# FocusTube
 
-StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional FastAPI backend that helps students stay focused on YouTube by prioritizing videos relevant to a selected study topic.
+FocusTube is a production-style Chrome Extension (Manifest V3) + optional FastAPI backend that helps students stay focused on YouTube by prioritizing videos relevant to a selected study topic.
 
 ## Monorepo Structure
 
@@ -71,7 +71,7 @@ StudyTube Focus is a production-style Chrome Extension (Manifest V3) + optional 
   - `explore`: keeps unrelated cards lower-priority with warning
 - YouTube integration for home, search results, and watch sidebar via content script + MutationObserver
 - SPA/infinite-scroll resilience with debounced rescoring
-- Floating `Study Mode ON` badge
+- Floating `FocusTube ON` badge
 - “Why kept” reason (`matched keyword: ...`) + “Relevant” badge on cards
 - Toolbar toggle + popup toggles (`pause`, `show hidden for 60s`)
 - Allowlist/blocklist channel support

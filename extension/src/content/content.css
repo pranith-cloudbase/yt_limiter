@@ -1,4 +1,4 @@
-.studytube-floating-badge {
+.focustube-floating-badge {
   position: fixed;
   right: 14px;
   bottom: 14px;
@@ -11,7 +11,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
-.studytube-relevant-badge {
+.focustube-relevant-badge {
   display: inline-block;
   margin-top: 6px;
   padding: 2px 6px;
@@ -22,23 +22,23 @@
   font-weight: 600;
 }
 
-.studytube-reason {
+.focustube-reason {
   margin-top: 4px;
   color: #6e6e6e;
   font-size: 11px;
 }
 
-.studytube-hidden {
+.focustube-hidden {
   display: none !important;
 }
 
-.studytube-blurred {
+.focustube-blurred {
   filter: blur(3px) saturate(0.6);
   opacity: 0.45;
   transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-.studytube-collapsed {
+.focustube-collapsed {
   max-height: 34px;
   overflow: hidden;
   opacity: 0.55;
